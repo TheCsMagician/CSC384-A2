@@ -214,7 +214,7 @@ class GameState:
 
     #############################################
     #             Helper methods:               #
-    # You shouldn't need to call these directly #
+    # You shouldn't need to cal	l these directly #
     #############################################
 
     def __init__( self, prevState = None ):
