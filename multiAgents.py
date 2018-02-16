@@ -77,13 +77,20 @@ class ReflexAgent(Agent):
 	ghost_pos = successorGameState.getGhostPositions()[0]
 	food_list = newFood.asList()
 	food_min = 9999
+	ghost_min = 9999
+	
 	for i in food_list:
-	    cost = util.manhattanDistance(newPos,ghost_pos)/util.manhattanDistance(newPos,i)+successorGameState.getScore()
+	    cost = util.manhattanDistance(newPos,i)
 	    if cost < food_min:
 	        food_min = cost
+	
+	for i in newGhostStates:
+	    cost = util.manhattanDistance(newPos,i.getPosition())
+	    if cost < ghost_min:
+		ghost_min = cost 
 	if newPos == ghost_pos:
-	    return -1000
-        return food_min
+	    return -10000
+        return ghost_min/food_min +successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -138,6 +145,50 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        def max_agent(state, depth):
+	    minimax = -9999
+	    best_path = 0
+            if state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+            actions = state.getLegalActions(0)
+            
+            for action in actions:
+		pac_state = state.generateSuccessor(0, action)
+                score = min_agent(pac_state,1,depth)
+                if score > minimax:
+                    minimax = score
+                    best_path = action
+            if depth == 0:
+                return best_path
+            return minimax
+
+        def min_agent(state,ind,depth):
+	    mini = 9999
+	    if state.isLose() or state.isWin():
+                return self.evaluationFunction(state)
+            actions = state.getLegalActions(ind)
+            for action in actions:
+		gho_state = state.generateSuccessor(ind, action)
+                if ind == state.getNumAgents() - 1:
+                    if depth == self.depth-1:
+                        score = self.evaluationFunction(gho_state)
+                    else:
+                        score = max_agent(gho_state, depth + 1)
+                else:
+                    score = min_agent(gho_state,ind+1,depth)
+                if score < mini:
+                    mini = score
+            return mini
+        return max_agent(gameState, 0)
+		        
+		
+		    
+		
+		    
+
+	    
+	
+		
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
