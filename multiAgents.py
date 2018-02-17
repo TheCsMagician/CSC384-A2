@@ -121,6 +121,7 @@ class MultiAgentSearchAgent(Agent):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
+	
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -171,7 +172,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 		gho_state = state.generateSuccessor(ind, action)
                 if ind == state.getNumAgents() - 1:
                     if depth == self.depth-1:
-                        score = self.evaluationFunction(gho_state)
+                        score= self.evaluationFunction(gho_state)
                     else:
                         score = max_agent(gho_state, depth + 1)
                 else:
@@ -201,6 +202,53 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
+        def max_agent(state, depth,alpha,beta):
+	    minimax = -9999
+	    best_path = 0
+            if state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+            actions = state.getLegalActions(0)
+            for action in actions:
+		pac_state = state.generateSuccessor(0, action)
+                score = min_agent(pac_state,1,depth,alpha,beta)
+                if score > minimax:
+                    minimax = score
+                    best_path = action
+
+	    	if score >= beta:
+		    return minimax
+		if score > alpha:
+		    alpha = score
+            if depth == 0:
+                return best_path
+            return minimax
+
+        def min_agent(state,ind,depth,alpha,beta):
+	    mini = 9999
+	    if state.isLose() or state.isWin():
+                return self.evaluationFunction(state)
+            actions = state.getLegalActions(ind)
+            for action in actions:
+		gho_state = state.generateSuccessor(ind, action)
+		
+                if ind == state.getNumAgents() - 1:
+                    if depth == self.depth-1:
+                        score = self.evaluationFunction(gho_state)
+		    
+                    else:
+                        score = max_agent(gho_state, depth + 1,alpha,beta)
+                else:
+                    score = min_agent(gho_state,ind+1,depth,alpha,beta)
+                if score < mini:
+                    mini = score
+		if score <= alpha:
+		    return mini
+		if score < beta:
+		    beta = score
+            return mini
+        return max_agent(gameState, 0,-9999,9999)
+   
+
         util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
