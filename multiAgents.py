@@ -70,12 +70,118 @@ class ReflexAgent(Agent):
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
+        newWall = successorGameState.getWalls()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        #print(newGhostStates[0].getDirection())
+        #print('\n')
+        #print('curr {}, succ {}'.format(currentGameState.getScore(), successorGameState.getScore()))
+        #print(newFood == newFood)
+        #print(currentGameState.getCapsules())
 
+        "*** YOUR CODE HERE ***"
+        #current_capsules_pos = currentGameState.getCapsules()
+        score = successorGameState.getScore()
+        
+        heuristic = 0
+        #if  newPos in current_capsules_pos and :
+        curr_pos = currentGameState.getPacmanPosition()
+        curr_food = currentGameState.getFood()
+
+        
+        curr_closest_ghost_dist = getClosestGhost(curr_pos, newGhostStates)[1]
+        succ_closest_ghost_dist = getClosestGhost(newPos, newGhostStates)[1]
+        is_closer_ghost = succ_closest_ghost_dist - curr_closest_ghost_dist
+        
+        succ_closest_food_dist = getClosestFood(newPos, newFood)[1]
+        curr_closest_food_dist = getClosestFood(newPos, curr_food)[1]
+        is_closer_food = succ_closest_food_dist - curr_closest_food_dist
+
+        #closest_capsul_dist = getClosestCapsule(newPos, successorGameState.getCapsules())
+        
+        #print(is_closer)
+        if  newScaredTimes[0] > 0 and newScaredTimes[0] > succ_closest_ghost_dist and is_closer_ghost < 0:
+            heuristic += 2 * score
+            #print(heuristic)
+        elif is_closer_ghost < 0 and succ_closest_ghost_dist < 2:
+            heuristic += -3 * score
+            #print(heuristic)
+        #elif closest_capsul_dist - succ_closest_ghost_dist > 1
+        
+        if  is_closer_food <= 0:
+            heuristic += 1 * score
+            #print(heuristic)
+        elif newWall[newPos[0]][newPos[1]]:
+            heuristic += -1 * score
+        
+        
+        
+        return heuristic
+
+
+def getClosestFood(pacman_pos ,newFood):
+    """
+    return the coordiantes of the closest food , and the distance
+    to it
+    """
+    curr_pos = pacman_pos
+    dist_state_dic = {}
+    food_list = newFood.asList()
+    
+    for f_pos in food_list:
+
+        dist = util.manhattanDistance(curr_pos,f_pos)
+        dist_state_dic[dist] = f_pos
+        
+    distances = dist_state_dic.keys()
+    min_dist = min(distances)
+    
+    min_pos = dist_state_dic[min_dist]
+    
+    return min_pos, min_dist
+
+
+def getClosestGhost(pacman_pos ,ghost_states):
+    """
+    return the coordiantes of the closest ghost state, and the distance
+    to it
+    """
+    curr_pos = pacman_pos
+    dist_state_dic = {}
+    
+    for g_state in ghost_states:
+        ghost_pos = g_state.getPosition()
+        dist = util.manhattanDistance(curr_pos,ghost_pos)
+        dist_state_dic[dist] = ghost_pos
+        
+    distances = dist_state_dic.keys()
+    min_dist = min(distances)
+    
+    min_pos = dist_state_dic[min_dist]
+    
+    return min_pos, min_dist
+
+def getClosestCapsule(pacman_pos ,capsules_pos):
+    """
+    return the coordiantes of the closest capsul, and the distance
+    to it
+    """
+    curr_pos = pacman_pos
+    dist_pos_dic = {}
+    
+    for c_pos in capsules_pos:
+
+        dist = util.manhattanDistance(curr_pos, c_pos)
+        dist_pos_dic[dist] = c_pos
+        
+    distances = dist_pos_dic.keys()
+    min_dist = min(distances)
+    
+    min_pos = dist_pos_dic[min_dist]
+    
+    return min_pos, min_dist
+    
 def scoreEvaluationFunction(currentGameState):
     """
       This default evaluation function just returns the score of the state.
