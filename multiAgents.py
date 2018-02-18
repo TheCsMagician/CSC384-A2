@@ -85,7 +85,7 @@ class ReflexAgent(Agent):
         score = successorGameState.getScore()
         
         heuristic = 0
-        #if  newPos in current_capsules_pos and :
+        
         curr_pos = currentGameState.getPacmanPosition()
         curr_food = currentGameState.getFood()
 
@@ -94,31 +94,60 @@ class ReflexAgent(Agent):
         succ_closest_ghost_dist = getClosestGhost(newPos, newGhostStates)[1]
         is_closer_ghost = succ_closest_ghost_dist - curr_closest_ghost_dist
         
-        succ_closest_food_dist = getClosestFood(newPos, newFood)[1]
-        curr_closest_food_dist = getClosestFood(newPos, curr_food)[1]
-        is_closer_food = succ_closest_food_dist - curr_closest_food_dist
-
-        #closest_capsul_dist = getClosestCapsule(newPos, successorGameState.getCapsules())
         
+        curr_closest_food = getClosestFood(curr_pos, curr_food)
+        curr_closest_food_dist = curr_closest_food[1]
+        curr_closest_food_pos = curr_closest_food[0]
+
+        succ_dist_to_closest_food = getDistPacman(newPos, curr_closest_food_pos)
+        is_closer_food = succ_dist_to_closest_food - curr_closest_food_dist
+
+        #print(is_closer_food)
+        capsules_list = currentGameState.getCapsules()
+        
+        if succ_closest_ghost_dist < 1:
+            heuristic += -3 #* score
+            #print(heuristic)
+            print('run away')
+        
+        elif capsules_list != [] and newScaredTimes[0] == 0:
+            closest_capsul = getClosestCapsule(curr_pos, capsules_list)
+            
+            closest_capsul_dist = closest_capsul[1]
+            closest_capsul_pos = closest_capsul[0]
+    
+            succ_dist_to_closest_capsul = getDistPacman(newPos, closest_capsul_pos)
+            is_closer_capsule = succ_dist_to_closest_capsul - closest_capsul_dist
+            
+            if is_closer_capsule < 0 and succ_dist_to_closest_capsul < 6 :
+                heuristic += 3
+                print('eat the capsule')
+            
         #print(is_closer)
-        if  newScaredTimes[0] > 0 and newScaredTimes[0] > succ_closest_ghost_dist and is_closer_ghost < 0:
-            heuristic += 2 * score
+        elif  newScaredTimes[0] > 0 and newScaredTimes[0] > succ_closest_ghost_dist*2 and is_closer_ghost < 0:
+            heuristic += 3 #* score
+            print('eat the ghost')
             #print(heuristic)
-        elif is_closer_ghost < 0 and succ_closest_ghost_dist < 2:
-            heuristic += -3 * score
-            #print(heuristic)
-        #elif closest_capsul_dist - succ_closest_ghost_dist > 1
         
-        if  is_closer_food <= 0:
-            heuristic += 1 * score
+        
+        if  is_closer_food < 0:
+            heuristic += 2 #* score
             #print(heuristic)
+            #print('getting closer to food')
         elif newWall[newPos[0]][newPos[1]]:
-            heuristic += -1 * score
+            heuristic += -1 #* score
+            print('move away form the wall')
         
+        #print(heuristic)
         
-        
-        return heuristic
+        return heuristic + score
 
+
+
+def getDistPacman(pacman_pos ,obj_pos):
+    '''return distacne to object'''
+    
+    return  util.manhattanDistance(pacman_pos,obj_pos)
 
 def getClosestFood(pacman_pos ,newFood):
     """
