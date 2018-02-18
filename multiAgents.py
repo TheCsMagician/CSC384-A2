@@ -74,24 +74,28 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-	ghost_pos = successorGameState.getGhostPositions()[0]
+    	ghost_pos = successorGameState.getGhostPositions()[0]
 	food_list = newFood.asList()
 	food_min = 9999
 	ghost_min = 9999
-
+	h = successorGameState.getScore()
 	
-	for i in food_list:
+	for i in food_list: 
 	    cost = util.manhattanDistance(newPos,i)
 	    if cost < food_min:
 	        food_min = cost
+	    if cost < 1:
+		food_min += 100
 	
 	for i in newGhostStates:
 	    cost = util.manhattanDistance(newPos,i.getPosition())
 	    if cost < ghost_min:
-		ghost_min = cost 
+		ghost_min = cost
+	    if cost < 2:
+		ghost_min -= 200 
 	if newPos == ghost_pos:
 	    return -10000
-        return ghost_min/food_min + successorGameState.getScore()
+        return ghost_min/food_min + h
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -309,6 +313,7 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
+    
     util.raiseNotDefined()
 
 # Abbreviation
