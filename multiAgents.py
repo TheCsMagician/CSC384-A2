@@ -310,10 +310,47 @@ def betterEvaluationFunction(currentGameState):
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION: The algorithm accounts for the fact that there is food capsule.
+      The closer it is to the pacman the greather the score
     """
     "*** YOUR CODE HERE ***"
-    
+    newPos = currentGameState.getPacmanPosition()
+    newFood = currentGameState.getFood()
+    newGhostStates = currentGameState.getGhostStates()
+    capsules = currentGameState.getCapsules()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+    ghost_pos = currentGameState.getGhostPositions()[0]
+    food_list = newFood.asList()
+    food_min = 9999
+    ghost_min = 9999
+    cap_min = 9999
+    h = currentGameState.getScore()
+    for i in food_list: 
+        cost = util.manhattanDistance(newPos,i)
+	if cost < food_min:
+	    food_min = cost
+	if cost < 1:
+	    food_min += 100
+    for i in newGhostStates:
+        cost = util.manhattanDistance(newPos,i.getPosition())
+	if cost < ghost_min:
+	    ghost_min = cost
+	if cost < 2:
+	    ghost_min -= 200 
+	if newScaredTimes[0] != 0 and cost < 5:
+	    ghost_min += 300
+    for i in capsules:
+	cost = util.manhattanDistance(newPos,i)
+	if cost < cap_min:
+	    cap_min = cost
+	if cost < 1 and ghost_min < 5:
+	    h += 200
+    if cap_min == 9999:
+	cap_min = 0
+	
+    if newPos == ghost_pos:
+        return -10000
+    return (ghost_min+cap_min)/food_min + h
     util.raiseNotDefined()
 
 # Abbreviation
