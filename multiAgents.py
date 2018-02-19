@@ -107,6 +107,18 @@ class ReflexAgent(Agent):
         
         
         
+        
+        #print(is_closer)
+        if  newScaredTimes[0] > 0 and newScaredTimes[0] > succ_closest_ghost_dist*2 and is_closer_ghost < 0:
+            heuristic += 2 #* score
+            #print('eat the ghost')
+            #print(heuristic)
+        
+        elif succ_closest_ghost_dist < 1 and newScaredTimes[0] == 0:
+            heuristic += -3 #* score
+            #print(heuristic)
+            #print('run away')
+        
         if capsules_list != [] and newScaredTimes[0] == 0:
             closest_capsul = getClosestCapsule(curr_pos, capsules_list)
             
@@ -121,28 +133,17 @@ class ReflexAgent(Agent):
             if is_closer_capsule < 0 and succ_dist_to_closest_capsul < 10\
             and capsule_to_ghost_dist < 20:
                 heuristic += 2
-                print('eat the capsule')
+                #print('eat the capsule')
             
-        #print(is_closer)
-        if  newScaredTimes[0] > 0 and newScaredTimes[0] > succ_closest_ghost_dist*2 and is_closer_ghost < 0:
-            heuristic += 2 #* score
-            print('eat the ghost')
-            #print(heuristic)
-        
-        elif succ_closest_ghost_dist < 1 and newScaredTimes[0] == 0:
-            heuristic += -3 #* score
-            #print(heuristic)
-            print('run away')
-        
-        
+            
         if  is_closer_food < 0:
             heuristic += 2 #* score
             #print(heuristic)
             #print('getting closer to food')
         elif newWall[newPos[0]][newPos[1]]:
             heuristic += -1 #* score
-            print('move away form the wall')
-        
+            #print('move away form the wall')
+        #
         #print(heuristic)
         
         return heuristic + score
