@@ -105,7 +105,7 @@ class ReflexAgent(Agent):
         #print(is_closer_food)
         capsules_list = currentGameState.getCapsules()
         
-        if succ_closest_ghost_dist < 1:
+        if succ_closest_ghost_dist < 1 and newScaredTimes[0] == 0:
             heuristic += -3 #* score
             #print(heuristic)
             print('run away')
