@@ -105,12 +105,9 @@ class ReflexAgent(Agent):
         #print(is_closer_food)
         capsules_list = currentGameState.getCapsules()
         
-        if succ_closest_ghost_dist < 1 and newScaredTimes[0] == 0:
-            heuristic += -3 #* score
-            #print(heuristic)
-            print('run away')
         
-        elif capsules_list != [] and newScaredTimes[0] == 0:
+        
+        if capsules_list != [] and newScaredTimes[0] == 0:
             closest_capsul = getClosestCapsule(curr_pos, capsules_list)
             
             closest_capsul_dist = closest_capsul[1]
@@ -119,15 +116,23 @@ class ReflexAgent(Agent):
             succ_dist_to_closest_capsul = getDistPacman(newPos, closest_capsul_pos)
             is_closer_capsule = succ_dist_to_closest_capsul - closest_capsul_dist
             
-            if is_closer_capsule < 0 and succ_dist_to_closest_capsul < 6 :
-                heuristic += 3
+            capsule_to_ghost_dist = getDistPacman(getClosestGhost(curr_pos, newGhostStates)[0], closest_capsul_pos)
+            
+            if is_closer_capsule < 0 and succ_dist_to_closest_capsul < 10\
+            and capsule_to_ghost_dist < 20:
+                heuristic += 2
                 print('eat the capsule')
             
         #print(is_closer)
-        elif  newScaredTimes[0] > 0 and newScaredTimes[0] > succ_closest_ghost_dist*2 and is_closer_ghost < 0:
-            heuristic += 3 #* score
+        if  newScaredTimes[0] > 0 and newScaredTimes[0] > succ_closest_ghost_dist*2 and is_closer_ghost < 0:
+            heuristic += 2 #* score
             print('eat the ghost')
             #print(heuristic)
+        
+        elif succ_closest_ghost_dist < 1 and newScaredTimes[0] == 0:
+            heuristic += -3 #* score
+            #print(heuristic)
+            print('run away')
         
         
         if  is_closer_food < 0:
