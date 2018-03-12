@@ -74,27 +74,29 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-    	ghost_pos = successorGameState.getGhostPositions()[0]
-	food_list = newFood.asList()
-	food_min = 9999
-	ghost_min = 9999
-	h = successorGameState.getScore()
-	
-	for i in food_list: 
-	    cost = util.manhattanDistance(newPos,i)
-	    if cost < food_min:
-	        food_min = cost
-	    if cost < 1:
-		food_min += 100
-	
-	for i in newGhostStates:
-	    cost = util.manhattanDistance(newPos,i.getPosition())
-	    if cost < ghost_min:
-		ghost_min = cost
-	    if cost < 2:
-		ghost_min -= 200 
-	if newPos == ghost_pos:
-	    return -10000
+        ghost_pos = successorGameState.getGhostPositions()[0]
+        food_list = newFood.asList()
+        food_min = 9999
+        ghost_min = 9999
+        h = successorGameState.getScore()
+
+        for i in food_list: 
+            cost = util.manhattanDistance(newPos,i)
+            if cost < food_min:
+                food_min = cost
+            if cost < 1:
+                food_min += 100
+
+        for i in newGhostStates:
+            cost = util.manhattanDistance(newPos,i.getPosition())
+            if cost < ghost_min:
+                ghost_min = cost
+            if cost < 2:
+                ghost_min -= 200 
+        
+        if newPos == ghost_pos:
+            return -10000
+        
         return ghost_min/food_min + h
 
 def scoreEvaluationFunction(currentGameState):
@@ -152,29 +154,30 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         def max_agent(state, depth):
-	    minimax = -9999
-	    best_path = 0
+            minimax = -9999
+            best_path = 0
             if state.isWin() or state.isLose():
                 return self.evaluationFunction(state)
             actions = state.getLegalActions(0)
             
             for action in actions:
-		pac_state = state.generateSuccessor(0, action)
+                pac_state = state.generateSuccessor(0, action)
                 score = min_agent(pac_state,1,depth)
                 if score > minimax:
                     minimax = score
                     best_path = action
+            
             if depth == 0:
                 return best_path
             return minimax
 
         def min_agent(state,ind,depth):
-	    mini = 9999
-	    if state.isLose() or state.isWin():
+            mini = 9999
+            if state.isLose() or state.isWin():
                 return self.evaluationFunction(state)
             actions = state.getLegalActions(ind)
             for action in actions:
-		gho_state = state.generateSuccessor(ind, action)
+                gho_state = state.generateSuccessor(ind, action)
                 if ind == state.getNumAgents() - 1:
                     if depth == self.depth-1:
                         score= self.evaluationFunction(gho_state)
@@ -192,10 +195,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
 		
 		    
 
-	    
-	
-		
-        util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -208,34 +207,35 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         def max_agent(state, depth,alpha,beta):
-	    minimax = -9999
-	    best_path = 0
+            minimax = -9999
+            best_path = 0
             if state.isWin() or state.isLose():
                 return self.evaluationFunction(state)
             actions = state.getLegalActions(0)
+            
             for action in actions:
-		pac_state = state.generateSuccessor(0, action)
+                pac_state = state.generateSuccessor(0, action)
                 score = min_agent(pac_state,1,depth,alpha,beta)
                 if score > minimax:
                     minimax = score
                     best_path = action
 
-	    	if score >= beta:
-		    return minimax
-		if score > alpha:
-		    alpha = score
+                if score >= beta:
+                    return minimax
+                if score > alpha:
+                    alpha = score
             if depth == 0:
                 return best_path
             return minimax
 
         def min_agent(state,ind,depth,alpha,beta):
-	    mini = 9999
-	    if state.isLose() or state.isWin():
+            mini = 9999
+            if state.isLose() or state.isWin():
                 return self.evaluationFunction(state)
             actions = state.getLegalActions(ind)
             for action in actions:
-		gho_state = state.generateSuccessor(ind, action)
-		
+                gho_state = state.generateSuccessor(ind, action)
+                
                 if ind == state.getNumAgents() - 1:
                     if depth == self.depth-1:
                         score = self.evaluationFunction(gho_state)
@@ -244,17 +244,18 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                         score = max_agent(gho_state, depth + 1,alpha,beta)
                 else:
                     score = min_agent(gho_state,ind+1,depth,alpha,beta)
+                
                 if score < mini:
                     mini = score
-		if score <= alpha:
-		    return mini
-		if score < beta:
-		    beta = score
+                if score <= alpha:
+                    return mini
+                if score < beta:
+                    beta = score
             return mini
         return max_agent(gameState, 0,-9999,9999)
    
 
-        util.raiseNotDefined()
+        
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -270,14 +271,14 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         def max_agent(state, depth):
-	    minimax = -9999
-	    best_path = 0
+            minimax = -9999
+            best_path = 0
             if state.isWin() or state.isLose():
                 return self.evaluationFunction(state)
             actions = state.getLegalActions(0)
-            
+
             for action in actions:
-		pac_state = state.generateSuccessor(0, action)
+                pac_state = state.generateSuccessor(0, action)
                 score = min_agent(pac_state,1,depth,1)
                 if score > minimax:
                     minimax = score
@@ -287,12 +288,12 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             return minimax
 
         def min_agent(state,ind,depth,counter):
-	    total = 0
-	    if state.isLose() or state.isWin():
+            total = 0
+            if state.isLose() or state.isWin():
                 return self.evaluationFunction(state)
             actions = state.getLegalActions(ind)
             for action in actions:
-		gho_state = state.generateSuccessor(ind, action)
+                gho_state = state.generateSuccessor(ind, action)
                 if ind == state.getNumAgents() - 1:
                     if depth == self.depth-1:
                         score= self.evaluationFunction(gho_state)
@@ -302,8 +303,9 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                     score= min_agent(gho_state,ind+1,depth,counter+1)
                 total+=score
             return total/counter
+        
         return max_agent(gameState, 0)
-        util.raiseNotDefined()
+        
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -327,31 +329,34 @@ def betterEvaluationFunction(currentGameState):
     h = currentGameState.getScore()
     for i in food_list: 
         cost = util.manhattanDistance(newPos,i)
-	if cost < food_min:
-	    food_min = cost
-	if cost < 1:
-	    food_min += 100
+        if cost < food_min:
+            food_min = cost
+        if cost < 1:
+            food_min += 100
+    
     for i in newGhostStates:
         cost = util.manhattanDistance(newPos,i.getPosition())
-	if cost < ghost_min:
-	    ghost_min = cost
-	if cost < 2:
-	    ghost_min -= 200 
-	if newScaredTimes[0] != 0 and cost < 5:
-	    ghost_min += 300
+        if cost < ghost_min:
+            ghost_min = cost
+        if cost < 2:
+            ghost_min -= 200 
+        if newScaredTimes[0] != 0 and cost < 5:
+            ghost_min += 300
+    
     for i in capsules:
-	cost = util.manhattanDistance(newPos,i)
-	if cost < cap_min:
-	    cap_min = cost
-	if cost < 1 and ghost_min < 5:
-	    h += 200
+        cost = util.manhattanDistance(newPos,i)
+        if cost < cap_min:
+            cap_min = cost
+        if cost < 1 and ghost_min < 5:
+            h += 200
     if cap_min == 9999:
-	cap_min = 0
-	
+        cap_min = 0
+
     if newPos == ghost_pos:
         return -10000
+    
     return (ghost_min+cap_min)/food_min + h
-    util.raiseNotDefined()
+
 
 # Abbreviation
 better = betterEvaluationFunction
